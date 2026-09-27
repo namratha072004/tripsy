@@ -23,8 +23,8 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
   return (
     <div className="min-w-0">
       <p className="text-[10px] font-semibold tracking-[0.14em] text-muted uppercase">{label}</p>
-      <p className="truncate font-display text-lg font-extrabold leading-tight">{value}</p>
-      {sub && <p className="truncate text-xs text-muted">{sub}</p>}
+      <p className="font-display text-[15px] font-extrabold leading-tight break-words sm:text-lg">{value}</p>
+      {sub && <p className="text-xs leading-snug text-muted break-words">{sub}</p>}
     </div>
   );
 }
@@ -83,7 +83,7 @@ export function BoardingPass({
               <p className="truncate font-display text-3xl font-extrabold leading-none">
                 {fromCodes.length === 1 ? fromCodes[0] : "CREW"}
               </p>
-              <p className="mt-1 truncate text-xs text-muted">{fromCodes.join(" · ")}</p>
+              <p className="mt-1 text-xs leading-snug text-muted break-words">{fromCodes.join(" · ")}</p>
             </div>
             <div aria-hidden className="flex flex-col items-center text-coral">
               <span className="text-xl">✈</span>
@@ -94,7 +94,7 @@ export function BoardingPass({
               <p className="truncate font-display text-3xl font-extrabold leading-none text-coral-deep">
                 {c.destination_airport ?? "✿"}
               </p>
-              <p className="mt-1 truncate text-xs text-muted">{c.destination_name}</p>
+              <p className="mt-1 text-xs leading-snug text-muted break-words">{c.destination_name}</p>
             </div>
           </div>
 
@@ -104,7 +104,7 @@ export function BoardingPass({
           </h2>
 
           {/* Details grid */}
-          <div className="mt-4 grid grid-cols-3 gap-x-3 gap-y-3 rounded-2xl bg-cream/80 p-4">
+          <div className="mt-4 grid grid-cols-3 gap-x-2.5 gap-y-3 rounded-2xl bg-cream/80 p-3.5 sm:gap-x-3 sm:p-4">
             {w ? (
               <>
                 <Field label="Depart" value={formatDay(w.start)} sub={weekday(w.start)} />
@@ -117,8 +117,8 @@ export function BoardingPass({
               </>
             )}
             <Field label="Locked" value={locked.time} sub={locked.date} />
-            <Field label="Passengers" value={String(passengers.length)} sub="the whole crew" />
-            <Field label="Gate" value="Group chat" />
+            <Field label="Crew" value={String(passengers.length)} sub="all aboard" />
+            <Field label="Gate" value="The chat" />
             <Field label="Seat" value="Window" sub="obviously" />
           </div>
 
