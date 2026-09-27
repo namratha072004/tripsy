@@ -76,7 +76,7 @@ export function DestinationPicks({
                 >
                   {on && <span aria-hidden>♡ </span>}
                   {d.name}
-                  {d.country && <span className="ml-1 text-xs text-muted">{d.country}</span>}
+                  {d.country && d.country !== d.name && <span className="ml-1 text-xs text-muted">{d.country}</span>}
                 </button>
               );
             })}
