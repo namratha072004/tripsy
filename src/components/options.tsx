@@ -1,6 +1,7 @@
 import { FitChip, FitLegend } from "./fit";
-import { dayRange, formatDateTime, formatDay, formatMoney } from "@/lib/time";
-import type { Candidate, Decision, PersonBreakdown } from "@/lib/types";
+import { BoardingPass } from "./boarding-pass";
+import { dayRange, formatDay, formatMoney } from "@/lib/time";
+import type { Candidate, Decision, Participant, PersonBreakdown } from "@/lib/types";
 
 const BUDGET_TEXT: Record<PersonBreakdown["budget"], string> = {
   ok: "Flights fit the budget",
@@ -122,36 +123,17 @@ export function LockedPlan({
   decision,
   currency,
   organiser,
+  participants,
 }: {
   c: Candidate;
   decision: Decision;
   currency: string;
   organiser: string;
+  participants: Participant[];
 }) {
-  const w = c.score_breakdown.window;
-  const why =
-    decision.locked_by === "all_responded"
-      ? "Everyone weighed in, so it's settled."
-      : decision.locked_by === "deadline"
-        ? "The deadline passed, so the top option is the plan."
-        : `Locked by ${decision.locked_by}.`;
   return (
-    <section className="space-y-4">
-      <div className="rounded-3xl bg-coral-deep p-6 text-center text-white shadow-soft">
-        <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-medium">
-          🔒 Final plan
-        </span>
-        <h2 className="mt-3 font-display text-3xl font-extrabold">It&apos;s happening: {c.destination_name}</h2>
-        {w && (
-          <p className="mt-1 text-lg">
-            {dayRange(w.start, w.end, " to ")}
-          </p>
-        )}
-        <p className="mt-3 text-sm">
-          {why} Locked {formatDateTime(decision.locked_at)}.
-        </p>
-        <p className="mt-1 text-sm">Time to book those tickets. Only {organiser}, who set up this trip, can reopen it.</p>
-      </div>
+    <section className="space-y-5">
+      <BoardingPass c={c} decision={decision} participants={participants} organiser={organiser} />
       <OptionCard c={c} rank={0} currency={currency} />
     </section>
   );

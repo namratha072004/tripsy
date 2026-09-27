@@ -21,7 +21,7 @@ export default async function TripPage(props: PageProps<"/t/[code]">) {
       <div className="space-y-4">
         <h1 className="font-display text-lg font-bold text-muted">{trip.name}</h1>
         {chosen ? (
-          <LockedPlan c={chosen} decision={decision} currency={trip.base_currency} organiser={trip.coordinator_name} />
+          <LockedPlan c={chosen} decision={decision} currency={trip.base_currency} organiser={trip.coordinator_name} participants={participants} />
         ) : (
           <p className="card">The plan is locked.</p>
         )}
