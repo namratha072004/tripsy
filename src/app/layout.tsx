@@ -20,7 +20,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${heading.variable} ${body.variable} antialiased`}>
       <body className="min-h-dvh font-sans">
         <header className="mx-auto flex max-w-xl items-center px-4 pt-5">
-          <Link href="/" className="font-display text-xl font-extrabold text-coral-deep">
+          <Link href="/" className="flex items-center gap-2 font-display text-xl font-extrabold text-coral-deep">
+            <span
+              aria-hidden
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blush to-sand text-base shadow-sm"
+            >
+              ✈
+            </span>
             tripsy
           </Link>
         </header>
