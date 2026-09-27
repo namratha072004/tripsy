@@ -180,3 +180,5 @@ alter table public.decision_events        enable row level security;
 revoke execute on function public.lock_trip(uuid, uuid, text)                           from public, anon, authenticated;
 revoke execute on function public.reopen_trip(uuid, text, text, timestamptz)            from public, anon, authenticated;
 revoke execute on function public.guard_trip_status()                                   from public, anon, authenticated;
+grant execute on function public.lock_trip(uuid, uuid, text)                             to service_role;
+grant execute on function public.reopen_trip(uuid, text, text, timestamptz)              to service_role;
