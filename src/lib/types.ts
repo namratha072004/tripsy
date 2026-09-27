@@ -35,6 +35,7 @@ export interface Preference {
   destination_type_preferences: string[];
   hard_no_list: string[];
   open_to_abroad: boolean;
+  favourite_destinations: string[]; // empty = "let Tripsy choose"
   submitted_at: string;
 }
 
@@ -57,6 +58,7 @@ export interface PersonBreakdown {
   typeMatch: boolean;
   hardNo: string | null; // the hard-no entry that matched, if any
   abroadBlocked?: boolean; // international trip, but they said India only
+  picked?: boolean | null; // null = they let Tripsy choose
   budget: BudgetStatus;
   flightCost: number | null;
   budgetAmount: number;
@@ -66,7 +68,7 @@ export interface PersonBreakdown {
 export interface ScoreBreakdown {
   window: { start: string; end: string; available: number; total: number } | null;
   people: PersonBreakdown[];
-  weights: { dates: number; type: number; budget: number };
+  weights: { dates: number; type: number; budget: number; picked?: number };
 }
 
 export interface Candidate {

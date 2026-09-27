@@ -18,7 +18,9 @@ function Breakdown({ c, currency }: { c: Candidate; currency: string }) {
       </summary>
       <p className="hint mt-1">
         Each person scores out of 100: dates {weights.dates}, trip type {weights.type}, budget{" "}
-        {weights.budget}. A hard no makes it 0 for that person. If a cost estimate is
+        {weights.budget}
+        {weights.picked ? `, plus ${weights.picked} if it's a place they hand-picked (only for people who picked any)` : ""}. A
+        hard no makes it 0 for that person. If a cost estimate is
         unavailable, budget is left out rather than guessed. Overall is the group average.
       </p>
       {window && (
@@ -40,6 +42,7 @@ function Breakdown({ c, currency }: { c: Candidate; currency: string }) {
                 {p.typeMatch ? "a match" : "not their pick"}
                 {p.hardNo ? ` · Hard no: "${p.hardNo}"` : ""}
                 {p.abroadBlocked ? " · India only" : ""}
+                {p.picked === true ? " · One of their picks ♡" : ""}
               </li>
               <li>
                 {BUDGET_TEXT[p.budget]}

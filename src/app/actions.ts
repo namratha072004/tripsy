@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { airportFor, DESTINATION_TYPES } from "@/lib/places";
+import { airportFor, DESTINATION_TYPES, DESTINATIONS } from "@/lib/places";
 import { hashToken, newToken, tokenMatches } from "@/lib/token";
 import { loadTrip, loadTripAndSettle, regenerateOptions } from "@/lib/trips";
 import { fromIstInput } from "@/lib/time";
@@ -124,6 +124,11 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
     return { error: "Let us know if you're up for going abroad." };
   }
 
+  const known = new Set(DESTINATIONS.map((d) => d.name));
+  const favourites = [...new Set(fd.getAll("favourites").map(String))]
+    .filter((n) => known.has(n))
+    .slice(0, 5);
+
   const hardNos = str(fd, "hard_no")
     .split(/[,\n]/)
     .map((s) => s.trim())
@@ -143,6 +148,7 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
         destination_type_preferences: types,
         hard_no_list: hardNos,
         open_to_abroad: abroad === "yes",
+        favourite_destinations: favourites,
         submitted_at: new Date().toISOString(),
       },
       { onConflict: "participant_id" },

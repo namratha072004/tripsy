@@ -19,6 +19,8 @@ import type { Destination } from "./places";
 //   - Dates (40 pts): the group window (below) sits fully inside one of their
 //     available ranges.
 //   - Type (30 pts): the destination has at least one type they picked.
+//   - Picked (20 pts): only for people who hand-picked favourite places; the
+//     place is one of their picks. People who "let Tripsy choose" skip this.
 //   - Budget (30 pts): round-trip flight vs their total budget.
 //       flight <= 50% of budget → ok (30), <= 75% → stretch (15), else over (0).
 //     If the fare is unavailable or currencies differ, budget is "unknown" and
@@ -31,7 +33,7 @@ import type { Destination } from "./places";
 //
 // Destination overall score = average of submitted people's scores.
 
-export const WEIGHTS = { dates: 40, type: 30, budget: 30 } as const;
+export const WEIGHTS = { dates: 40, type: 30, budget: 30, picked: 20 } as const;
 const MAX_WINDOW_DAYS = 7;
 
 type Window = ScoreBreakdown["window"];
@@ -134,6 +136,14 @@ export function scorePerson(
   if (typeMatch) earned += WEIGHTS.type;
   else reasons.push("Not the kind of trip they picked");
 
+  const favourites = pref.favourite_destinations ?? [];
+  const picked = favourites.length ? favourites.includes(dest.name) : null;
+  if (picked !== null) {
+    possible += WEIGHTS.picked;
+    if (picked) earned += WEIGHTS.picked;
+    else reasons.push("Not one of the places they picked");
+  }
+
   if (budget !== "unknown") {
     possible += WEIGHTS.budget;
     if (budget === "ok") earned += WEIGHTS.budget;
@@ -172,6 +182,7 @@ export function scorePerson(
     typeMatch,
     hardNo,
     abroadBlocked,
+    picked,
     budget,
     flightCost: fare?.status === "ok" ? fare.amount : null,
     budgetAmount: pref.budget_amount,

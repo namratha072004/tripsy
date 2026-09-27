@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useFormAction } from "./use-form-action";
+import { DestinationPicks } from "./destination-picks";
 import { savePreferences } from "@/app/actions";
 import { DESTINATION_TYPES } from "@/lib/places";
 import type { Preference } from "@/lib/types";
@@ -22,7 +24,19 @@ export function PreferencesForm({
 }) {
   const { state, pending, onSubmit } = useFormAction(savePreferences);
   const ranges = existing?.available_date_ranges ?? [];
-  const types = new Set(existing?.destination_type_preferences ?? []);
+  const [types, setTypes] = useState<Set<string>>(
+    () => new Set(existing?.destination_type_preferences ?? []),
+  );
+  const [abroad, setAbroad] = useState<"yes" | "no" | "">(
+    existing ? (existing.open_to_abroad === false ? "no" : "yes") : "",
+  );
+  const toggleType = (id: string, on: boolean) =>
+    setTypes((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
   const currency = existing?.budget_currency ?? baseCurrency;
 
   return (
@@ -94,7 +108,8 @@ export function PreferencesForm({
                 type="checkbox"
                 name="types"
                 value={t.id}
-                defaultChecked={types.has(t.id)}
+                checked={types.has(t.id)}
+                onChange={(e) => toggleType(t.id, e.target.checked)}
                 className="peer sr-only"
               />
               <span className="inline-block rounded-full border border-line bg-card px-4 py-2 text-sm transition peer-checked:border-coral peer-checked:bg-blush peer-checked:text-[#8a3e2f] peer-focus-visible:ring-2 peer-focus-visible:ring-coral/40">
@@ -118,7 +133,8 @@ export function PreferencesForm({
                 type="radio"
                 name="abroad"
                 value={o.value}
-                defaultChecked={existing ? (existing.open_to_abroad !== false) === (o.value === "yes") : false}
+                checked={abroad === o.value}
+                onChange={() => setAbroad(o.value as "yes" | "no")}
                 className="peer sr-only"
                 required
               />
@@ -129,6 +145,12 @@ export function PreferencesForm({
           ))}
         </div>
       </section>
+
+      <DestinationPicks
+        types={types}
+        abroad={abroad}
+        initial={existing?.favourite_destinations ?? []}
+      />
 
       <section className="card space-y-2">
         <h2 className="font-display text-lg font-extrabold">Any hard no&apos;s?</h2>
