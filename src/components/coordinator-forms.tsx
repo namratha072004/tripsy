@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFormAction } from "./use-form-action";
 import { DeadlineFields } from "./deadline-fields";
 import { changeDeadline, reopenTrip, type FormState } from "@/app/actions";
@@ -18,26 +18,66 @@ function Status({ state }: { state: FormState }) {
 }
 
 export function CopyLink({ url, label }: { url: string; label: string }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "manual">("idle");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selectAll = () => inputRef.current?.select();
+
+  const copy = async () => {
+    // Clipboard API first; it's blocked in some browsers and embedded views.
+    try {
+      await navigator.clipboard.writeText(url);
+      setStatus("copied");
+      setTimeout(() => setStatus("idle"), 2000);
+      return;
+    } catch {}
+    // Fallback: select the text and use the legacy copy command.
+    selectAll();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch {}
+    setStatus(ok ? "copied" : "manual");
+    if (ok) setTimeout(() => setStatus("idle"), 2000);
+  };
+
   return (
-    <div className="flex gap-2">
-      <input readOnly value={url} className="field min-w-0 text-sm" aria-label={label} />
-      <button
-        type="button"
-        className="btn-ghost shrink-0"
-        onClick={async () => {
-          try {
-            await navigator.clipboard.writeText(url);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-          } catch {
-            setCopied(false);
-          }
-        }}
-      >
-        {copied ? "Copied" : "Copy"}
-      </button>
+    <div>
+      <div className="flex gap-2">
+        <input
+          ref={inputRef}
+          readOnly
+          value={url}
+          onFocus={selectAll}
+          onClick={selectAll}
+          className="field min-w-0 text-sm"
+          aria-label={label}
+        />
+        <button type="button" className="btn-ghost shrink-0" onClick={copy}>
+          {status === "copied" ? "Copied" : "Copy"}
+        </button>
+      </div>
+      {status === "manual" && (
+        <p className="hint mt-1" role="status">
+          Your browser blocked copying. The link is selected, so press Cmd+C (or Ctrl+C), or long-press
+          it on your phone.
+        </p>
+      )}
     </div>
+  );
+}
+
+export function WhatsAppShare({ url, tripName }: { url: string; tripName: string }) {
+  const text = `Planning "${tripName}" on Tripsy. Tap your name and add your answers: ${url}`;
+  return (
+    <a
+      href={`https://wa.me/?text=${encodeURIComponent(text)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn-ghost"
+    >
+      Share on WhatsApp
+    </a>
   );
 }
 

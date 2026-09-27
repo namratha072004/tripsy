@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { CopyLink, DeadlineForm, ReopenForm } from "@/components/coordinator-forms";
+import { CopyLink, DeadlineForm, ReopenForm, WhatsAppShare } from "@/components/coordinator-forms";
 import { LockedPlan, OptionsList } from "@/components/options";
 import { formatDateTime, toIstInput } from "@/lib/time";
 import { tokenMatches } from "@/lib/token";
@@ -63,6 +63,7 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
         <h2 className="font-display text-lg font-extrabold">Share with the group</h2>
         <p className="hint">Drop this in the WhatsApp group. Everyone taps their own name.</p>
         <CopyLink url={shareUrl} label="Group link" />
+        <WhatsAppShare url={shareUrl} tripName={trip.name} />
       </section>
 
       <section className="card">
