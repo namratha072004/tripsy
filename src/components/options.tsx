@@ -43,6 +43,7 @@ function Breakdown({ c, currency }: { c: Candidate; currency: string }) {
                 {p.hardNo ? ` · Hard no: "${p.hardNo}"` : ""}
                 {p.abroadBlocked ? " · India only" : ""}
                 {p.picked === true ? " · One of their picks ♡" : ""}
+                {p.picked === false ? " · Not one of their picks" : ""}
               </li>
               <li>
                 {BUDGET_TEXT[p.budget]}
