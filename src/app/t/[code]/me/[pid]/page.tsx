@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { PreferencesForm } from "@/components/preferences-form";
 import { formatDateTime } from "@/lib/time";
-import { loadTripAndSettle } from "@/lib/trips";
+import { confirmedIds, loadTripAndSettle } from "@/lib/trips";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +35,7 @@ export default async function MePage(props: PageProps<"/t/[code]/me/[pid]">) {
         participantId={person.id}
         baseCurrency={b.trip.base_currency}
         existing={pref}
+        reconfirm={b.events.some((e) => e.event === "reopened") && !confirmedIds(b).has(person.id)}
       />
     </div>
   );

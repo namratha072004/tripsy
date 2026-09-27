@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useFormAction } from "./use-form-action";
 import { DeadlineFields } from "./deadline-fields";
-import { changeDeadline, reopenTrip, type FormState } from "@/app/actions";
+import { changeDeadline, lockNow, reopenTrip, type FormState } from "@/app/actions";
 
 function Status({ state }: { state: FormState }) {
   if (state?.error)
@@ -90,6 +90,38 @@ export function DeadlineForm({ code, token, current }: { code: string; token: st
       <DeadlineFields id="deadline" label="Change the deadline (IST)" defaultValue={current} />
       <button className="btn-ghost" disabled={pending}>Save deadline</button>
       <p className="hint">Everyone will see the new time. Changes are logged below.</p>
+      <Status state={state} />
+    </form>
+  );
+}
+
+export function LockNowForm({
+  code,
+  token,
+  destinationId,
+  destinationName,
+  waiting,
+}: {
+  code: string;
+  token: string;
+  destinationId: string;
+  destinationName: string;
+  waiting: number;
+}) {
+  const { state, pending, onSubmit } = useFormAction(lockNow);
+  return (
+    <form onSubmit={onSubmit} className="space-y-2 border-t border-line pt-3">
+      <input type="hidden" name="code" value={code} />
+      <input type="hidden" name="token" value={token} />
+      <input type="hidden" name="destination_id" value={destinationId} />
+      <p className="text-sm">
+        Group already agreed? You can lock <strong className="font-medium">{destinationName}</strong> now
+        {waiting > 0 ? ` without waiting for ${waiting} more ${waiting === 1 ? "person" : "people"}` : ""}.
+        It&apos;ll show in the history as locked by you.
+      </p>
+      <button className="btn w-full" disabled={pending}>
+        {pending ? "Locking…" : `Lock ${destinationName} now`}
+      </button>
       <Status state={state} />
     </form>
   );

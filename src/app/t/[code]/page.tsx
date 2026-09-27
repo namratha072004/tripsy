@@ -44,7 +44,7 @@ export default async function TripPage(props: PageProps<"/t/[code]">) {
         <p className="rounded-3xl bg-sand px-5 py-3 text-[#6e4b0c]">
           {b.events[0].actor} reopened the plan
           {b.events[0].destination_name ? ` (it was ${b.events[0].destination_name})` : ""}:{" "}
-          &ldquo;{b.events[0].reason}&rdquo;. Update your answers if anything&apos;s changed.
+          &ldquo;{b.events[0].reason}&rdquo;. Tap your name and confirm your answers again, even if nothing&apos;s changed.
         </p>
       )}
 

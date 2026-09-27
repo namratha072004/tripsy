@@ -12,11 +12,13 @@ export function PreferencesForm({
   participantId,
   baseCurrency,
   existing,
+  reconfirm = false,
 }: {
   code: string;
   participantId: string;
   baseCurrency: string;
   existing: Preference | null;
+  reconfirm?: boolean;
 }) {
   const { state, pending, onSubmit } = useFormAction(savePreferences);
   const ranges = existing?.available_date_ranges ?? [];
@@ -141,13 +143,18 @@ export function PreferencesForm({
         />
       </section>
 
+      {reconfirm && (
+        <p className="rounded-2xl bg-sand px-4 py-2 text-sm text-[#6e4b0c]">
+          The plan was reopened. Check your answers and tap Confirm, even if nothing&apos;s changed.
+        </p>
+      )}
       {state?.error && (
         <p role="alert" className="rounded-2xl bg-[#f8d5d0] px-4 py-2 text-sm text-[#8a2f25]">
           {state.error}
         </p>
       )}
       <button className="btn w-full" disabled={pending}>
-        {pending ? "Saving…" : existing ? "Update my answers" : "I'm in"}
+        {pending ? "Saving…" : reconfirm ? "Confirm my answers" : existing ? "Update my answers" : "I'm in"}
       </button>
     </form>
   );

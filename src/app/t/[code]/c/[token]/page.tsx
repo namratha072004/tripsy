@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { CopyLink, DeadlineForm, ReopenForm, WhatsAppShare } from "@/components/coordinator-forms";
+import { CopyLink, DeadlineForm, LockNowForm, ReopenForm, WhatsAppShare } from "@/components/coordinator-forms";
 import { LockedPlan, OptionsList } from "@/components/options";
 import { formatDateTime, toIstInput } from "@/lib/time";
 import { tokenMatches } from "@/lib/token";
-import { loadTripAndSettle } from "@/lib/trips";
+import { confirmedIds, loadTripAndSettle } from "@/lib/trips";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +35,8 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
   const myUrl = `${base}/t/${code}/c/${token}`;
 
   const answered = new Set(preferences.map((p) => p.participant_id));
+  const confirmed = confirmedIds(b);
+  const reopened = trip.status === "collecting" && events.some((e) => e.event === "reopened");
   const locked = trip.status === "locked" && decision;
   const chosen = decision && candidates.find((c) => c.id === decision.locked_destination_id);
   const soon = toIstInput(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000));
@@ -70,7 +72,7 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
         <div className="flex items-baseline justify-between">
           <h2 className="font-display text-lg font-extrabold">Who&apos;s in</h2>
           <span className="hint">
-            {answered.size} of {participants.length}
+            {confirmed.size} of {participants.length}
           </span>
         </div>
         <ul className="mt-2 divide-y divide-line">
@@ -79,8 +81,12 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
               <span>
                 {p.name} <span className="hint">· {p.home_city}</span>
               </span>
-              {answered.has(p.id) ? (
-                <span className="rounded-full bg-sage px-3 py-0.5 text-xs text-sage-deep">Answered</span>
+              {confirmed.has(p.id) ? (
+                <span className="rounded-full bg-sage px-3 py-0.5 text-xs text-sage-deep">
+                  {reopened ? "Re-confirmed" : "Answered"}
+                </span>
+              ) : reopened && answered.has(p.id) ? (
+                <span className="rounded-full bg-sand px-3 py-0.5 text-xs text-[#6e4b0c]">Needs to re-confirm</span>
               ) : (
                 <span className="rounded-full bg-sand px-3 py-0.5 text-xs text-[#6e4b0c]">Waiting</span>
               )}
@@ -88,7 +94,9 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
           ))}
         </ul>
         <p className="hint mt-2">
-          The group page never shows who&apos;s still waiting. A gentle nudge is up to you.
+          {reopened
+            ? "Since you reopened, everyone needs to tap their name and confirm again (even if nothing changed) before it auto-locks."
+            : "The group page never shows who's still waiting. A gentle nudge is up to you."}
         </p>
       </section>
 
@@ -105,6 +113,15 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
               soon as everyone&apos;s answered.
             </p>
             <DeadlineForm code={code} token={token} current={toIstInput(new Date(trip.deadline))} />
+            {candidates[0] && (
+              <LockNowForm
+                code={code}
+                token={token}
+                destinationId={candidates[0].id}
+                destinationName={candidates[0].destination_name}
+                waiting={participants.length - confirmed.size}
+              />
+            )}
           </section>
           {candidates.length > 0 ? (
             <section className="space-y-3">

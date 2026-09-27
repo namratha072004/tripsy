@@ -121,16 +121,21 @@ export async function regenerateOptions(b: TripBundle): Promise<void> {
 
 export type LockReason = "deadline" | "all_responded";
 
-export function lockDue(b: TripBundle, now = new Date()): LockReason | null {
-  if (b.trip.status !== "collecting") return null;
-  const total = b.participants.length;
-  // After a reopen, only answers given since then count toward "everyone's in";
-  // otherwise the plan would instantly re-lock on the old answers.
+// Participant ids whose answers count toward "everyone's in". After a reopen,
+// only answers given since then count; otherwise the plan would instantly
+// re-lock on the old answers.
+export function confirmedIds(b: TripBundle): Set<string> {
   const reopenedAt = b.events.find((e) => e.event === "reopened")?.created_at;
   const fresh = reopenedAt
     ? b.preferences.filter((p) => new Date(p.submitted_at) > new Date(reopenedAt))
     : b.preferences;
-  const submitted = new Set(fresh.map((p) => p.participant_id)).size;
+  return new Set(fresh.map((p) => p.participant_id));
+}
+
+export function lockDue(b: TripBundle, now = new Date()): LockReason | null {
+  if (b.trip.status !== "collecting") return null;
+  const total = b.participants.length;
+  const submitted = confirmedIds(b).size;
   if (total > 0 && submitted >= total) return "all_responded";
   if (now >= new Date(b.trip.deadline)) return "deadline";
   return null;

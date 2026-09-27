@@ -191,6 +191,29 @@ export async function changeDeadline(_: FormState, fd: FormData): Promise<FormSt
   return { ok: "Deadline updated." };
 }
 
+// Organiser locks the current top option now, without waiting for the deadline.
+export async function lockNow(_: FormState, fd: FormData): Promise<FormState> {
+  const ctx = await coordinatorTrip(fd);
+  if (!ctx) return { error: "Only the organiser link can lock the plan." };
+  const { b, code } = ctx;
+  if (b.trip.status !== "collecting") return { error: "The plan is already locked." };
+  const top = b.candidates[0];
+  if (!top) return { error: "There are no options to lock yet. Wait for someone to answer." };
+  if (str(fd, "destination_id") !== top.id) {
+    return { error: "The options just changed. Refresh and check the top pick again." };
+  }
+
+  const { error } = await db().rpc("lock_trip", {
+    p_trip_id: b.trip.id,
+    p_destination_id: top.id,
+    p_locked_by: b.trip.coordinator_name,
+  });
+  if (error) return { error: "Couldn't lock the plan. Try again in a moment." };
+
+  revalidatePath(`/t/${code}`, "layout");
+  return { ok: `Locked: ${top.destination_name}.` };
+}
+
 export async function reopenTrip(_: FormState, fd: FormData): Promise<FormState> {
   const ctx = await coordinatorTrip(fd);
   if (!ctx) return { error: "Only the coordinator link can reopen the plan." };
