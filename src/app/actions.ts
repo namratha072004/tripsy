@@ -18,13 +18,20 @@ function str(fd: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
+// Deadline arrives as separate date + time fields (see DeadlineFields).
+function deadlineFrom(fd: FormData): Date | null {
+  const date = str(fd, "deadline_date");
+  const time = str(fd, "deadline_time") || "20:00";
+  return fromIstInput(`${date}T${time}`);
+}
+
 // ---------------------------------------------------------------------------
 // Create trip
 // ---------------------------------------------------------------------------
 export async function createTrip(_: FormState, fd: FormData): Promise<FormState> {
   const name = str(fd, "name");
   const coordinator = str(fd, "coordinator");
-  const deadline = fromIstInput(str(fd, "deadline"));
+  const deadline = deadlineFrom(fd);
 
   const people: { name: string; city: string }[] = [];
   for (let i = 0; i < MAX_PEOPLE; i++) {
@@ -98,11 +105,13 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
 
   const ranges: DateRange[] = [];
   for (let i = 0; i < 3; i++) {
-    const s = str(fd, `start_${i}`);
-    const e = str(fd, `end_${i}`);
-    if (!s && !e) continue;
-    if (!s || !e) return { error: "Each date range needs a start and an end." };
-    if (e < s) return { error: "One of your date ranges ends before it starts." };
+    // Only one date filled in → treat it as a single free day.
+    const s = str(fd, `start_${i}`) || str(fd, `end_${i}`);
+    const e = str(fd, `end_${i}`) || s;
+    if (!s) continue;
+    if (e < s) {
+      return { error: `In dates ${i + 1}, the "to" date is before the "from" date.` };
+    }
     ranges.push({ start: s, end: e });
   }
   if (ranges.length === 0) return { error: "Add at least one stretch of dates you're free." };
@@ -161,7 +170,7 @@ export async function changeDeadline(_: FormState, fd: FormData): Promise<FormSt
   if (b.trip.status !== "collecting") {
     return { error: "The plan is locked. Reopen it first if you really need to." };
   }
-  const deadline = fromIstInput(str(fd, "deadline"));
+  const deadline = deadlineFrom(fd);
   if (!deadline || deadline.getTime() <= Date.now()) {
     return { error: "Pick a new deadline in the future." };
   }
@@ -186,7 +195,7 @@ export async function reopenTrip(_: FormState, fd: FormData): Promise<FormState>
   const reason = str(fd, "reason");
   if (reason.length < 5) return { error: "Add a short reason. Everyone will see it." };
   if (str(fd, "confirm") !== "REOPEN") return { error: "Type REOPEN to confirm." };
-  const deadline = fromIstInput(str(fd, "deadline"));
+  const deadline = deadlineFrom(fd);
   if (!deadline || deadline.getTime() <= Date.now()) {
     return { error: "Pick a new deadline in the future." };
   }

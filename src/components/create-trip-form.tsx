@@ -1,15 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
-import { createTrip, type FormState } from "@/app/actions";
+import { useFormAction } from "./use-form-action";
+import { DeadlineFields } from "./deadline-fields";
+import { createTrip } from "@/app/actions";
 
 const ROWS = 6;
 
 export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(createTrip, undefined);
+  const { state, pending, onSubmit } = useFormAction(createTrip);
 
   return (
-    <form action={action} className="card space-y-5">
+    <form onSubmit={onSubmit} className="card space-y-5">
       <div>
         <label className="label" htmlFor="name">Trip name</label>
         <input id="name" name="name" className="field" placeholder="Winter getaway 2026" required maxLength={80} />
@@ -20,15 +21,7 @@ export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string })
         <p className="hint mt-1">You&apos;ll get a private organiser link. Keep it to yourself.</p>
       </div>
       <div>
-        <label className="label" htmlFor="deadline">Answers due by (IST)</label>
-        <input
-          id="deadline"
-          name="deadline"
-          type="datetime-local"
-          className="field"
-          defaultValue={defaultDeadline}
-          required
-        />
+        <DeadlineFields id="deadline" label="Answers due by (IST)" defaultValue={defaultDeadline} />
         <p className="hint mt-1">
           When this passes, or once everyone&apos;s answered, the top option locks in as the plan.
         </p>

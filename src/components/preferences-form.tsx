@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { savePreferences, type FormState } from "@/app/actions";
+import { useFormAction } from "./use-form-action";
+import { savePreferences } from "@/app/actions";
 import { DESTINATION_TYPES } from "@/lib/places";
 import type { Preference } from "@/lib/types";
 
@@ -18,13 +18,13 @@ export function PreferencesForm({
   baseCurrency: string;
   existing: Preference | null;
 }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(savePreferences, undefined);
+  const { state, pending, onSubmit } = useFormAction(savePreferences);
   const ranges = existing?.available_date_ranges ?? [];
   const types = new Set(existing?.destination_type_preferences ?? []);
   const currency = existing?.budget_currency ?? baseCurrency;
 
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-4">
       <input type="hidden" name="code" value={code} />
       <input type="hidden" name="participant_id" value={participantId} />
 
@@ -54,7 +54,13 @@ export function PreferencesForm({
 
       <section className="card space-y-2">
         <h2 className="font-display text-lg font-extrabold">When are you free?</h2>
-        <p className="hint">Add up to three stretches of dates.</p>
+        <p className="hint">
+          Add up to three stretches. Only free for one day? Fill in just the &ldquo;from&rdquo; date.
+        </p>
+        <div className="grid grid-cols-2 gap-2 text-sm font-medium">
+          <span>From</span>
+          <span>To</span>
+        </div>
         {[0, 1, 2].map((i) => (
           <div key={i} className="grid grid-cols-2 gap-2">
             <input
@@ -62,7 +68,7 @@ export function PreferencesForm({
               name={`start_${i}`}
               className="field"
               defaultValue={ranges[i]?.start ?? ""}
-              aria-label={`Range ${i + 1} start`}
+              aria-label={`Dates ${i + 1}: from`}
               required={i === 0}
             />
             <input
@@ -70,8 +76,7 @@ export function PreferencesForm({
               name={`end_${i}`}
               className="field"
               defaultValue={ranges[i]?.end ?? ""}
-              aria-label={`Range ${i + 1} end`}
-              required={i === 0}
+              aria-label={`Dates ${i + 1}: to`}
             />
           </div>
         ))}
