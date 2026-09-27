@@ -90,7 +90,7 @@ export function OptionCard({
         {c.destination_type}
         {w ? ` · ${dayRange(w.start, w.end, "–")}` : ""} · score {c.overall_score}
       </p>
-      <div className="mt-3 flex gap-1.5">
+      <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))] gap-1.5">
         {c.score_breakdown.people.map((p) => (
           <FitChip key={p.participantId} fit={p.fit} name={p.name} />
         ))}

@@ -1,13 +1,16 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useFormAction } from "./use-form-action";
 import { DeadlineFields } from "./deadline-fields";
 import { createTrip } from "@/app/actions";
-
-const ROWS = 6;
+import { MAX_PEOPLE, MIN_PEOPLE } from "@/lib/limits";
 
 export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string }) {
   const { state, pending, onSubmit } = useFormAction(createTrip);
+  // Stable ids so removing a row doesn't shift what's typed in the others.
+  const [rows, setRows] = useState([0, 1, 2]);
+  const nextId = useRef(3);
 
   return (
     <form onSubmit={onSubmit} className="card space-y-5">
@@ -28,10 +31,15 @@ export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string })
       </div>
 
       <fieldset>
-        <legend className="label">Who&apos;s coming? (include yourself)</legend>
+        <div className="flex items-baseline justify-between">
+          <legend className="label">Who&apos;s coming? (include yourself)</legend>
+          <span className="hint">
+            {rows.length} {rows.length === 1 ? "person" : "people"}
+          </span>
+        </div>
         <div className="space-y-2">
-          {Array.from({ length: ROWS }, (_, i) => (
-            <div key={i} className="grid grid-cols-2 gap-2">
+          {rows.map((rowId, i) => (
+            <div key={rowId} className="grid grid-cols-[1fr_1fr_auto] gap-2">
               <input
                 name={`p${i}_name`}
                 className="field"
@@ -46,10 +54,30 @@ export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string })
                 aria-label={`Person ${i + 1} home city`}
                 maxLength={60}
               />
+              <button
+                type="button"
+                onClick={() => setRows((r) => r.filter((id) => id !== rowId))}
+                className="h-11 w-11 rounded-full text-lg text-muted transition hover:bg-blush/60 disabled:opacity-30"
+                aria-label={`Remove person ${i + 1}`}
+                disabled={rows.length <= MIN_PEOPLE}
+              >
+                ×
+              </button>
             </div>
           ))}
         </div>
-        <p className="hint mt-1">Home city lets Tripsy estimate each person&apos;s own travel cost.</p>
+        {rows.length < MAX_PEOPLE ? (
+          <button
+            type="button"
+            onClick={() => setRows((r) => [...r, nextId.current++])}
+            className="btn-ghost mt-3"
+          >
+            + Add a friend
+          </button>
+        ) : (
+          <p className="hint mt-2">That&apos;s the max of {MAX_PEOPLE} people per trip.</p>
+        )}
+        <p className="hint mt-2">Home city lets Tripsy estimate each person&apos;s own travel cost.</p>
       </fieldset>
 
       {state?.error && (

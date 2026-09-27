@@ -8,10 +8,9 @@ import { hashToken, newToken, tokenMatches } from "@/lib/token";
 import { loadTrip, loadTripAndSettle, regenerateOptions } from "@/lib/trips";
 import { fromIstInput } from "@/lib/time";
 import type { DateRange } from "@/lib/types";
+import { MAX_PEOPLE, MIN_PEOPLE } from "@/lib/limits";
 
 export type FormState = { error?: string; ok?: string } | undefined;
-
-const MAX_PEOPLE = 8;
 
 function str(fd: FormData, key: string): string {
   const v = fd.get(key);
@@ -46,7 +45,7 @@ export async function createTrip(_: FormState, fd: FormData): Promise<FormState>
   if (!coordinator) return { error: "Add your name so the group knows who's organising." };
   if (!deadline) return { error: "Pick a response deadline." };
   if (deadline.getTime() <= Date.now()) return { error: "The deadline needs to be in the future." };
-  if (people.length < 2) return { error: "Add at least two people." };
+  if (people.length < MIN_PEOPLE) return { error: "Add at least two people." };
   const lower = people.map((p) => p.name.toLowerCase());
   if (new Set(lower).size !== lower.length) {
     return { error: "Two people have the same name. Add an initial so everyone can find themselves." };

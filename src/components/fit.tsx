@@ -10,7 +10,7 @@ export function FitChip({ fit, name }: { fit: Fit; name: string }) {
   const s = STYLES[fit];
   return (
     <div
-      className={`flex min-w-0 flex-1 flex-col items-center rounded-2xl px-1 py-2 text-xs ${s.bg}`}
+      className={`flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-xs ${s.bg}`}
       title={`${name}: ${s.label}`}
     >
       <span aria-hidden className="text-base font-bold leading-none">
