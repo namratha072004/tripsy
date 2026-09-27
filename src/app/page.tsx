@@ -13,9 +13,9 @@ export default function Home() {
           <span aria-hidden>✿</span> for friend groups who can&apos;t decide
         </span>
         <h1 className="mt-4 font-display text-[2.1rem] font-extrabold leading-[1.15] tracking-tight sm:text-[2.6rem]">
-          From &ldquo;let&apos;s plan something&rdquo;
+          Less &ldquo;we should totally go.&rdquo;
           <br />
-          to <span className="scribble">plane tickets.</span>
+          More <span className="scribble">&ldquo;we&apos;re going.&rdquo;</span>
         </h1>
         <p className="mt-3 max-w-md text-[17px] text-muted">
           Everyone answers once. Tripsy finds the spot that works for the whole crew, and when the

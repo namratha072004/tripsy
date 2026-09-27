@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useFormAction } from "./use-form-action";
 import { DeadlineFields } from "./deadline-fields";
+import { CityPicker } from "./city-picker";
 import { createTrip } from "@/app/actions";
 import { MAX_PEOPLE, MIN_PEOPLE } from "@/lib/limits";
 
@@ -57,13 +58,7 @@ export function CreateTripForm({ defaultDeadline }: { defaultDeadline: string })
                 aria-label={`Person ${i + 1} name`}
                 maxLength={40}
               />
-              <input
-                name={`p${i}_city`}
-                className="field"
-                placeholder={i === 0 ? "Home city" : "City"}
-                aria-label={`Person ${i + 1} home city`}
-                maxLength={60}
-              />
+              <CityPicker name={`p${i}_city`} label={`Person ${i + 1} home city`} />
               <button
                 type="button"
                 onClick={() => setRows((r) => r.filter((id) => id !== rowId))}

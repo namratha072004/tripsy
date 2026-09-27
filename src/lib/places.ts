@@ -24,6 +24,14 @@ const CITY_AIRPORTS: Record<string, string> = {
   mangalore: "IXE", mangaluru: "IXE",
 };
 
+// Shown in the home-city dropdown. Every entry maps to an airport above.
+export const HOME_CITIES = [
+  "Mumbai", "Delhi", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Pune",
+  "Ahmedabad", "Jaipur", "Kochi", "Goa", "Lucknow", "Chandigarh", "Indore",
+  "Coimbatore", "Nagpur", "Bhubaneswar", "Guwahati", "Thiruvananthapuram",
+  "Visakhapatnam", "Mangalore",
+];
+
 export function airportFor(city: string): string | null {
   return CITY_AIRPORTS[city.trim().toLowerCase()] ?? null;
 }
