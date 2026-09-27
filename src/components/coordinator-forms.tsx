@@ -68,7 +68,7 @@ export function CopyLink({ url, label }: { url: string; label: string }) {
 }
 
 export function WhatsAppShare({ url, tripName }: { url: string; tripName: string }) {
-  const text = `Planning "${tripName}" on Tripsy. Tap your name and add your answers: ${url}`;
+  const text = `Planning "${tripName}" on Tripsy! See how it's shaping up here: ${url}. I'll send you your personal link and code to add your answers.`;
   return (
     <a
       href={`https://wa.me/?text=${encodeURIComponent(text)}`}

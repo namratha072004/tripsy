@@ -18,6 +18,7 @@ export interface Participant {
   name: string;
   home_city: string;
   home_airport: string | null;
+  access_code: string; // private per-person code; never render on the group page
 }
 
 export interface DateRange {

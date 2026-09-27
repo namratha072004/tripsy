@@ -15,7 +15,9 @@ export function PreferencesForm({
   baseCurrency,
   existing,
   reconfirm = false,
+  accessCode,
 }: {
+  accessCode: string;
   code: string;
   participantId: string;
   baseCurrency: string;
@@ -43,6 +45,7 @@ export function PreferencesForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <input type="hidden" name="code" value={code} />
       <input type="hidden" name="participant_id" value={participantId} />
+      <input type="hidden" name="k" value={accessCode} />
 
       <section className="card space-y-2">
         <h2 className="font-display text-lg font-extrabold">What can you spend?</h2>

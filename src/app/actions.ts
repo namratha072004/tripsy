@@ -9,6 +9,7 @@ import { loadTrip, loadTripAndSettle, regenerateOptions } from "@/lib/trips";
 import { fromIstInput } from "@/lib/time";
 import type { DateRange } from "@/lib/types";
 import { MAX_PEOPLE, MIN_PEOPLE } from "@/lib/limits";
+import { codeMatches } from "@/lib/codes";
 
 export type FormState = { error?: string; ok?: string } | undefined;
 
@@ -93,6 +94,9 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
   if (!b) return { error: "This trip link doesn't work anymore." };
   const person = b.participants.find((p) => p.id === participantId);
   if (!person) return { error: "We couldn't find you on this trip." };
+  if (!codeMatches(person, str(fd, "k"))) {
+    return { error: "That code doesn't match. Use the personal link your organiser sent you." };
+  }
   if (b.trip.status === "locked") {
     return { error: "The plan's already locked, so answers can't change right now." };
   }

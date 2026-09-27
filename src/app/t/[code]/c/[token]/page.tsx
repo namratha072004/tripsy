@@ -6,6 +6,8 @@ import { LockedPlan, OptionsList } from "@/components/options";
 import { formatDateTime, toIstInput } from "@/lib/time";
 import { tokenMatches } from "@/lib/token";
 import { confirmedIds, loadTripAndSettle } from "@/lib/trips";
+import { personalPath } from "@/lib/codes";
+import { PersonalLink } from "@/components/personal-link";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +65,10 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
 
       <section className="card space-y-2">
         <h2 className="font-display text-lg font-extrabold">Share with the group</h2>
-        <p className="hint">Drop this in the WhatsApp group. Everyone taps their own name.</p>
+        <p className="hint">
+          Drop this in the WhatsApp group so everyone can see the options. To answer, each person
+          needs their own code from the list below.
+        </p>
         <CopyLink url={shareUrl} label="Group link" />
         <WhatsAppShare url={shareUrl} tripName={trip.name} />
       </section>
@@ -98,6 +103,25 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
             ? "Since you reopened, everyone needs to tap their name and confirm again (even if nothing changed) before it auto-locks."
             : "The group page never shows who's still waiting. A gentle nudge is up to you."}
         </p>
+      </section>
+
+      <section className="card">
+        <h2 className="font-display text-lg font-extrabold">Personal links</h2>
+        <p className="hint">
+          Send each friend their own link privately. Their code means nobody else can open or change
+          their answers.
+        </p>
+        <ul className="mt-2 divide-y divide-line">
+          {participants.map((p) => (
+            <PersonalLink
+              key={p.id}
+              name={p.name}
+              code={p.access_code}
+              url={`${base}${personalPath(code, p)}`}
+              tripName={trip.name}
+            />
+          ))}
+        </ul>
       </section>
 
       {locked && chosen ? (

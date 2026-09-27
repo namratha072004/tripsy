@@ -56,7 +56,10 @@ export default async function TripPage(props: PageProps<"/t/[code]">) {
 
       <section className="card">
         <h2 className="font-display text-xl font-extrabold">Who are you?</h2>
-        <p className="hint">Tap your name to add or update your answers.</p>
+        <p className="hint">
+          Tap your name to add or update your answers. You&apos;ll need the code{" "}
+          {trip.coordinator_name} sent you.
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {participants.map((p) => (
             <Link
