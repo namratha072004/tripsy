@@ -89,7 +89,8 @@ function coversWindow(ranges: DateRange[], w: NonNullable<Window>): boolean {
 }
 
 function matchHardNo(hardNos: string[], dest: Destination): string | null {
-  const haystack = [dest.name, ...dest.types].map((s) => s.toLowerCase());
+  const abroad = dest.country ? [dest.country, "abroad", "international", "overseas"] : [];
+  const haystack = [dest.name, ...dest.types, ...abroad].map((s) => s.toLowerCase());
   for (const raw of hardNos) {
     const h = raw.trim().toLowerCase();
     if (h.length < 3) continue;
@@ -145,14 +146,21 @@ export function scorePerson(
     reasons.push("Cost estimate unavailable");
   }
 
+  // open_to_abroad is missing on answers saved before the question existed → treat as yes.
+  const abroadBlocked = Boolean(dest.country) && pref.open_to_abroad === false;
+
   let score = possible > 0 ? (earned / possible) * 100 : 0;
   if (hardNo) {
     score = 0;
     reasons.unshift(`On their hard-no list ("${hardNo}")`);
   }
+  if (abroadBlocked) {
+    score = 0;
+    reasons.unshift("Not up for travelling abroad");
+  }
 
   let fit: Fit = "good";
-  if (hardNo || dates === false || budget === "over") fit = "no";
+  if (hardNo || abroadBlocked || dates === false || budget === "over") fit = "no";
   else if (!typeMatch || budget === "stretch") fit = "stretch";
 
   return {
@@ -163,6 +171,7 @@ export function scorePerson(
     dates,
     typeMatch,
     hardNo,
+    abroadBlocked,
     budget,
     flightCost: fare?.status === "ok" ? fare.amount : null,
     budgetAmount: pref.budget_amount,
@@ -174,6 +183,8 @@ export interface ScoredDestination {
   dest: Destination;
   breakdown: ScoreBreakdown;
   overall: number;
+  // Tie-breaker: how many of people's picked trip types this place covers, summed.
+  typeDepth: number;
 }
 
 export function scoreDestination(
@@ -188,18 +199,26 @@ export function scoreDestination(
   const overall = scored.length
     ? scored.reduce((sum, p) => sum + p.score, 0) / scored.length
     : 0;
+  const typeDepth = people.reduce(
+    (sum, { pref }) =>
+      sum + dest.types.filter((t) => pref.destination_type_preferences.includes(t)).length,
+    0,
+  );
   return {
     dest,
     breakdown: { window, people: scored, weights: { ...WEIGHTS } },
     overall: Math.round(overall * 10) / 10,
+    typeDepth,
   };
 }
 
-// Highest score first; ties broken by fewer "no" fits, then name for stability.
+// Highest score first; ties broken by fewer "no" fits, then by how many picked
+// trip types the place covers, then name for stability.
 export function rank(a: ScoredDestination, b: ScoredDestination): number {
   if (b.overall !== a.overall) return b.overall - a.overall;
   const noA = a.breakdown.people.filter((p) => p.fit === "no").length;
   const noB = b.breakdown.people.filter((p) => p.fit === "no").length;
   if (noA !== noB) return noA - noB;
+  if (b.typeDepth !== a.typeDepth) return b.typeDepth - a.typeDepth;
   return a.dest.name.localeCompare(b.dest.name);
 }

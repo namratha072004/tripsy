@@ -39,6 +39,7 @@ function Breakdown({ c, currency }: { c: Candidate; currency: string }) {
                 Dates: {p.dates === null ? "not checked" : p.dates ? "free" : "not free"} · Type:{" "}
                 {p.typeMatch ? "a match" : "not their pick"}
                 {p.hardNo ? ` · Hard no: "${p.hardNo}"` : ""}
+                {p.abroadBlocked ? " · India only" : ""}
               </li>
               <li>
                 {BUDGET_TEXT[p.budget]}

@@ -119,6 +119,11 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
   const types = fd.getAll("types").map(String).filter((t) => allowed.has(t));
   if (types.length === 0) return { error: "Pick at least one kind of trip you'd enjoy." };
 
+  const abroad = str(fd, "abroad");
+  if (abroad !== "yes" && abroad !== "no") {
+    return { error: "Let us know if you're up for going abroad." };
+  }
+
   const hardNos = str(fd, "hard_no")
     .split(/[,\n]/)
     .map((s) => s.trim())
@@ -137,6 +142,7 @@ export async function savePreferences(_: FormState, fd: FormData): Promise<FormS
         available_date_ranges: ranges,
         destination_type_preferences: types,
         hard_no_list: hardNos,
+        open_to_abroad: abroad === "yes",
         submitted_at: new Date().toISOString(),
       },
       { onConflict: "participant_id" },

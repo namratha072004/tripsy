@@ -104,6 +104,31 @@ export function PreferencesForm({
       </section>
 
       <section className="card space-y-2">
+        <h2 className="font-display text-lg font-extrabold">Up for going abroad?</h2>
+        <p className="hint">Think passport, visa, and leave. Places like Bali, Thailand, Dubai, Sri Lanka, or Nepal.</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: "yes", label: "Yes, I'm in" },
+            { value: "no", label: "India only for me" },
+          ].map((o) => (
+            <label key={o.value} className="cursor-pointer">
+              <input
+                type="radio"
+                name="abroad"
+                value={o.value}
+                defaultChecked={existing ? (existing.open_to_abroad !== false) === (o.value === "yes") : false}
+                className="peer sr-only"
+                required
+              />
+              <span className="inline-block rounded-full border border-line bg-card px-4 py-2 text-sm transition peer-checked:border-coral peer-checked:bg-blush peer-checked:text-[#8a3e2f] peer-focus-visible:ring-2 peer-focus-visible:ring-coral/40">
+                {o.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section className="card space-y-2">
         <h2 className="font-display text-lg font-extrabold">Any hard no&apos;s?</h2>
         <p className="hint">Places or things you really don&apos;t want. Separate with commas. Totally optional.</p>
         <textarea

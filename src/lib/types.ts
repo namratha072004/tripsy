@@ -34,6 +34,7 @@ export interface Preference {
   available_date_ranges: DateRange[];
   destination_type_preferences: string[];
   hard_no_list: string[];
+  open_to_abroad: boolean;
   submitted_at: string;
 }
 
@@ -55,6 +56,7 @@ export interface PersonBreakdown {
   dates: boolean | null; // null = no common window to check against
   typeMatch: boolean;
   hardNo: string | null; // the hard-no entry that matched, if any
+  abroadBlocked?: boolean; // international trip, but they said India only
   budget: BudgetStatus;
   flightCost: number | null;
   budgetAmount: number;

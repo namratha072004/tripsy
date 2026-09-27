@@ -106,7 +106,9 @@ export async function regenerateOptions(b: TripBundle): Promise<void> {
     trip_id: b.trip.id,
     destination_name: s.dest.name,
     destination_airport: s.dest.airport,
-    destination_type: s.dest.types.join(", "),
+    destination_type: s.dest.country
+      ? `${s.dest.country} · ${s.dest.types.join(", ")}`
+      : s.dest.types.join(", "),
     est_flight_cost_by_participant: s.fares,
     fits_dates_by_participant: Object.fromEntries(
       s.breakdown.people.map((p) => [p.participantId, p.dates]),

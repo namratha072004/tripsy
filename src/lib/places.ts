@@ -41,6 +41,7 @@ export interface Destination {
   name: string;
   airport: string; // nearest commercial airport
   types: string[];
+  country?: string; // set for international destinations (needs a passport)
 }
 
 // Starting catalog of candidate destinations. Scored against everyone's
@@ -61,4 +62,17 @@ export const DESTINATIONS: Destination[] = [
   { name: "Jaipur", airport: "JAI", types: ["heritage", "city"] },
   { name: "Hampi", airport: "VDY", types: ["heritage", "adventure"] },
   { name: "Varanasi", airport: "VNS", types: ["heritage", "city"] },
+
+  // International, short-haul from India
+  { name: "Bali", airport: "DPS", types: ["beach", "nature", "adventure"], country: "Indonesia" },
+  { name: "Phuket", airport: "HKT", types: ["beach", "adventure"], country: "Thailand" },
+  { name: "Bangkok", airport: "BKK", types: ["city", "heritage"], country: "Thailand" },
+  { name: "Da Nang and Hoi An", airport: "DAD", types: ["beach", "heritage", "city"], country: "Vietnam" },
+  { name: "Dubai", airport: "DXB", types: ["city", "adventure"], country: "UAE" },
+  { name: "Singapore", airport: "SIN", types: ["city"], country: "Singapore" },
+  { name: "Langkawi", airport: "LGK", types: ["beach", "nature"], country: "Malaysia" },
+  { name: "Maldives", airport: "MLE", types: ["beach"], country: "Maldives" },
+  { name: "Sri Lanka (Kandy and Ella)", airport: "CMB", types: ["nature", "heritage", "mountains"], country: "Sri Lanka" },
+  { name: "Pokhara", airport: "KTM", types: ["mountains", "adventure", "nature"], country: "Nepal" },
+  { name: "Bhutan (Paro and Thimphu)", airport: "PBH", types: ["mountains", "heritage", "nature"], country: "Bhutan" },
 ];
