@@ -93,7 +93,7 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
 
       {locked && chosen ? (
         <>
-          <LockedPlan c={chosen} decision={decision} currency={trip.base_currency} />
+          <LockedPlan c={chosen} decision={decision} currency={trip.base_currency} organiser={trip.coordinator_name} />
           <ReopenForm code={code} token={token} suggested={soon} />
         </>
       ) : (

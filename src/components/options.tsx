@@ -1,5 +1,5 @@
 import { FitChip, FitLegend } from "./fit";
-import { formatDateTime, formatDay, formatMoney } from "@/lib/time";
+import { dayRange, formatDateTime, formatDay, formatMoney } from "@/lib/time";
 import type { Candidate, Decision, PersonBreakdown } from "@/lib/types";
 
 const BUDGET_TEXT: Record<PersonBreakdown["budget"], string> = {
@@ -88,7 +88,7 @@ export function OptionCard({
       </div>
       <p className="hint">
         {c.destination_type}
-        {w ? ` · ${formatDay(w.start)}–${formatDay(w.end)}` : ""} · score {c.overall_score}
+        {w ? ` · ${dayRange(w.start, w.end, "–")}` : ""} · score {c.overall_score}
       </p>
       <div className="mt-3 flex gap-1.5">
         {c.score_breakdown.people.map((p) => (
@@ -116,10 +116,12 @@ export function LockedPlan({
   c,
   decision,
   currency,
+  organiser,
 }: {
   c: Candidate;
   decision: Decision;
   currency: string;
+  organiser: string;
 }) {
   const w = c.score_breakdown.window;
   const why =
@@ -137,13 +139,13 @@ export function LockedPlan({
         <h2 className="mt-3 font-display text-3xl font-extrabold">It&apos;s happening: {c.destination_name}</h2>
         {w && (
           <p className="mt-1 text-lg">
-            {formatDay(w.start)} to {formatDay(w.end)}
+            {dayRange(w.start, w.end, " to ")}
           </p>
         )}
         <p className="mt-3 text-sm">
           {why} Locked {formatDateTime(decision.locked_at)}.
         </p>
-        <p className="mt-1 text-sm">Time to book those tickets. Only the organiser can reopen this.</p>
+        <p className="mt-1 text-sm">Time to book those tickets. Only {organiser}, who set up this trip, can reopen it.</p>
       </div>
       <OptionCard c={c} rank={0} currency={currency} />
     </section>

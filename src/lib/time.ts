@@ -44,3 +44,8 @@ export function formatMoney(amount: number, currency: string): string {
     return `${currency} ${Math.round(amount)}`;
   }
 }
+
+// "8 Oct" for a single day, otherwise "8 Oct{sep}12 Oct".
+export function dayRange(start: string, end: string, sep: string): string {
+  return start === end ? formatDay(start) : `${formatDay(start)}${sep}${formatDay(end)}`;
+}
