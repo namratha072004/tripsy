@@ -15,6 +15,11 @@ const EVENT_TEXT = {
   deadline_changed: "Deadline changed",
 } as const;
 
+const ACTOR_TEXT: Record<string, string> = {
+  all_responded: "everyone answered",
+  deadline: "deadline passed",
+};
+
 export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[token]">) {
   const { code, token } = await props.params;
   const sp = await props.searchParams;
@@ -125,7 +130,7 @@ export default async function CoordinatorPage(props: PageProps<"/t/[code]/c/[tok
                 <span className="font-medium">{EVENT_TEXT[e.event]}</span>
                 {e.destination_name ? `: ${e.destination_name}` : ""} ·{" "}
                 <span className="hint">
-                  {e.actor}, {formatDateTime(e.created_at)}
+                  {ACTOR_TEXT[e.actor] ?? e.actor}, {formatDateTime(e.created_at)}
                 </span>
                 {e.reason && e.event === "reopened" && <p className="hint">&ldquo;{e.reason}&rdquo;</p>}
               </li>

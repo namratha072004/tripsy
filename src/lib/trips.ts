@@ -122,7 +122,13 @@ export type LockReason = "deadline" | "all_responded";
 export function lockDue(b: TripBundle, now = new Date()): LockReason | null {
   if (b.trip.status !== "collecting") return null;
   const total = b.participants.length;
-  const submitted = new Set(b.preferences.map((p) => p.participant_id)).size;
+  // After a reopen, only answers given since then count toward "everyone's in";
+  // otherwise the plan would instantly re-lock on the old answers.
+  const reopenedAt = b.events.find((e) => e.event === "reopened")?.created_at;
+  const fresh = reopenedAt
+    ? b.preferences.filter((p) => new Date(p.submitted_at) > new Date(reopenedAt))
+    : b.preferences;
+  const submitted = new Set(fresh.map((p) => p.participant_id)).size;
   if (total > 0 && submitted >= total) return "all_responded";
   if (now >= new Date(b.trip.deadline)) return "deadline";
   return null;
